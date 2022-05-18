@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id          String              @id @default(uuid())
+  title       String
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime?
+  Institution Event_institution[]
+  ticket      Ticket[]
+}
+
+model Event_institution {
+  id             String      @id @default(uuid())
+  institution_id String
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime?
+  event_id       String
+  event          Event       @relation(fields: [event_id], references: [id])
+  Institution    Institution @relation(fields: [institution_id], references: [id])
+}
+
+model Institution {
+  id               String              @id @default(uuid())
+  name             String
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime?
+  institution_type InstitutionType
+  event            Event_institution[]
+}
+
+model Ticket {
+  id        String          @id @default(uuid())
+  value     Int             @default(0)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime?
+  event_id  String
+  quantity  Int             @default(0)
+  event     Event           @relation(fields: [event_id], references: [id])
+  person    Person_ticket[]
+}
+
+model Person {
+  id        String          @id @default(uuid())
+  name      String
+  email     String
+  cpf       String
+  password  String
+  createdAt DateTime        @default(now())
+  updatedAt DateTime?
+  ticket    Person_ticket[]
+}
+
+model Person_ticket {
+  id        String    @id @default(uuid())
+  ticket_id String
+  person_id String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  Person    Person    @relation(fields: [person_id], references: [id])
+  ticket    Ticket    @relation(fields: [ticket_id], references: [id])
+}
+
+enum InstitutionType {
+  UNIVERSITY
+  COMPANY
+}
