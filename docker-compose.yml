@@ -1,0 +1,32 @@
+
+version: "3.7"
+services:
+  database:
+    image: postgres
+    container_name:  DesafioBD
+    restart: always
+    ports:
+      - 5433:5433
+    environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: DesafioLabs
+    volumes:
+      - pgdata:/data/postgres
+  app:
+    build: .
+    container_name: NestApp
+    ports:
+      - 3001:3001
+    environment:
+        DATABASE_URL: postgres://postgres:postgres@localhost:5433/DesafioLabs
+    volumes:
+      - .:/usr/app
+    links:
+      - database
+    depends_on:
+      - database
+
+volumes:
+  pgdata:
+    driver: local
